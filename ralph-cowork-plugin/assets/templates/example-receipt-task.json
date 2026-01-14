@@ -1,0 +1,65 @@
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "task": {
+    "description": "Process all receipt images in this folder and create a comprehensive expense spreadsheet for tax purposes. Extract date, vendor name, amount, and categorize each expense.",
+    "type": "document_processing",
+    "context": "These are business receipts from Q4 2025. Categories should include: Travel, Meals, Office Supplies, Software, and Other."
+  },
+  "folder": {
+    "path": "/Users/example/Documents/Receipts-Q4-2025",
+    "readOnly": [],
+    "outputSubfolder": "processed"
+  },
+  "successCriteria": {
+    "items": [
+      {
+        "description": "expenses.xlsx file exists in processed/ subfolder",
+        "validation": "file_exists",
+        "validationParams": {
+          "path": "processed/expenses.xlsx"
+        }
+      },
+      {
+        "description": "All image files have been processed (47 total)",
+        "validation": "row_count",
+        "validationParams": {
+          "file": "processed/expenses.xlsx",
+          "sheet": "Expenses",
+          "expectedRows": 47
+        }
+      },
+      {
+        "description": "Spreadsheet contains required columns: Date, Vendor, Amount, Category, Original_Filename",
+        "validation": "contains_text",
+        "validationParams": {
+          "file": "processed/expenses.xlsx",
+          "texts": ["Date", "Vendor", "Amount", "Category", "Original_Filename"]
+        }
+      },
+      {
+        "description": "Total row with SUM formula exists",
+        "validation": "manual"
+      },
+      {
+        "description": "No unprocessed images remain (all moved or logged)",
+        "validation": "manual"
+      }
+    ],
+    "completionSignal": "RECEIPTS_PROCESSED",
+    "stuckSignal": "CANNOT_PROCESS"
+  },
+  "maxIterations": 15,
+  "settings": {
+    "stuckThreshold": 3,
+    "createProgressLog": true,
+    "createBackup": true,
+    "model": "claude-sonnet-4-20250514",
+    "pauseBetweenIterations": 5
+  },
+  "notifications": {
+    "onComplete": true,
+    "onStuck": true,
+    "onMaxIterations": true,
+    "progressUpdates": "every_5"
+  }
+}
