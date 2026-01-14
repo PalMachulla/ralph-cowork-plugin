@@ -1,0 +1,162 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Ralph-Cowork Task Configuration",
+  "description": "Configuration schema for autonomous loop tasks",
+  "type": "object",
+  "required": ["task", "folder", "successCriteria", "maxIterations"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique task identifier (auto-generated)"
+    },
+    "task": {
+      "type": "object",
+      "required": ["description"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Natural language task description",
+          "minLength": 10,
+          "maxLength": 2000
+        },
+        "type": {
+          "type": "string",
+          "enum": ["document_processing", "content_creation", "data_analysis", "file_organization", "research", "custom"],
+          "description": "Task category for template selection"
+        },
+        "context": {
+          "type": "string",
+          "description": "Additional context or background information"
+        }
+      }
+    },
+    "folder": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Absolute path to working folder"
+        },
+        "readOnly": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Files/patterns that should not be modified"
+        },
+        "outputSubfolder": {
+          "type": "string",
+          "description": "Subfolder for generated outputs (default: root)"
+        }
+      }
+    },
+    "successCriteria": {
+      "type": "object",
+      "required": ["items", "completionSignal"],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["description"],
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "Specific, measurable criterion"
+              },
+              "validation": {
+                "type": "string",
+                "enum": ["file_exists", "row_count", "word_count", "contains_text", "manual"],
+                "description": "How to verify this criterion"
+              },
+              "validationParams": {
+                "type": "object",
+                "description": "Parameters for validation (e.g., filename, count)"
+              }
+            }
+          },
+          "minItems": 1,
+          "maxItems": 10
+        },
+        "completionSignal": {
+          "type": "string",
+          "description": "Exact text pattern for completion (e.g., 'TASK_COMPLETE')",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "stuckSignal": {
+          "type": "string",
+          "description": "Pattern prefix for stuck signals",
+          "default": "STUCK"
+        }
+      }
+    },
+    "maxIterations": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100,
+      "default": 20,
+      "description": "Maximum iterations before auto-stop"
+    },
+    "settings": {
+      "type": "object",
+      "properties": {
+        "stuckThreshold": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 3,
+          "description": "Consecutive stuck signals before stopping"
+        },
+        "createProgressLog": {
+          "type": "boolean",
+          "default": true,
+          "description": "Create/update progress.txt each iteration"
+        },
+        "createBackup": {
+          "type": "boolean",
+          "default": true,
+          "description": "Snapshot folder before starting"
+        },
+        "model": {
+          "type": "string",
+          "enum": ["claude-sonnet-4-20250514", "claude-opus-4-20250514"],
+          "default": "claude-sonnet-4-20250514",
+          "description": "Claude model to use"
+        },
+        "pauseBetweenIterations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 60,
+          "default": 5,
+          "description": "Seconds to wait between iterations"
+        }
+      }
+    },
+    "notifications": {
+      "type": "object",
+      "properties": {
+        "onComplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Notify when task completes"
+        },
+        "onStuck": {
+          "type": "boolean",
+          "default": true,
+          "description": "Notify when task gets stuck"
+        },
+        "onMaxIterations": {
+          "type": "boolean",
+          "default": true,
+          "description": "Notify when max iterations reached"
+        },
+        "progressUpdates": {
+          "type": "string",
+          "enum": ["none", "every_iteration", "every_5", "every_10"],
+          "default": "every_5",
+          "description": "How often to send progress notifications"
+        }
+      }
+    }
+  }
+}

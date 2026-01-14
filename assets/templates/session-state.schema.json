@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Ralph-Cowork Session State",
+  "description": "Runtime state for tracking loop execution",
+  "type": "object",
+  "required": ["taskId", "status", "iteration", "timestamps"],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "running", "paused", "complete", "stuck", "max_iterations", "cancelled", "error"]
+    },
+    "iteration": {
+      "type": "object",
+      "properties": {
+        "current": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max": {
+          "type": "integer"
+        },
+        "stuckCount": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        }
+      }
+    },
+    "timestamps": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "started": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastIteration": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completed": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "backup": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "boolean"
+        },
+        "path": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "files": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "modified": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "deleted": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "iterations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tokensUsed": {
+            "type": "object",
+            "properties": {
+              "input": { "type": "integer" },
+              "output": { "type": "integer" }
+            }
+          },
+          "result": {
+            "type": "string",
+            "enum": ["progress", "complete", "stuck", "error"]
+          },
+          "signal": {
+            "type": "string",
+            "description": "Completion or stuck signal detected"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Brief description of what happened"
+          }
+        }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "properties": {
+        "totalTokens": {
+          "type": "integer"
+        },
+        "estimatedCost": {
+          "type": "number",
+          "description": "Estimated USD cost"
+        }
+      }
+    },
+    "finalResult": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["success", "stuck", "max_iterations", "cancelled", "error"]
+        },
+        "signal": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "filesProduced": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}
